@@ -56,11 +56,10 @@ app.use("/_api", router);
 
 const addUrl = require("./db.js").addUrl;
 app.post('/api/shorturl', async (req, res) => {
-  const result = await addUrl('hello');
+  const { url } = req.body;
+  const { shortUrl, originalUrl } = await addUrl(url);
   
-  res.json({ 
-    greeting: 'short URL'
-  });
+  res.json({ short_url: shortUrl, original_url: originalUrl });
 });
 
 app.get('/api/shorturl/:urlId', (req, res) => {
