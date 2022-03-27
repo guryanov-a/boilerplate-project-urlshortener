@@ -21,11 +21,16 @@ const addUrl = async (address) => {
   }
 
   const shortUrl = new ShortUrl({ 
-    originalUrl: address,
+    originalUrl: formattedAddress,
   });
 
   return shortUrl.save();
 };
 
+const findUrl = async (urlId) => {
+  return ShortUrl.findOne({ shortUrl: urlId });
+};
+
 exports.ShortUrl = ShortUrl;
 exports.addUrl = addUrl;
+exports.findUrl = findUrl;

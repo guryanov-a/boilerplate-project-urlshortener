@@ -54,7 +54,7 @@ router.post("/mongoose-model", function (_, res) {
 
 app.use("/_api", router);
 
-const addUrl = require("./db.js").addUrl;
+const { addUrl } = require("./db.js");
 app.post('/api/shorturl', async (req, res) => {
   const { url } = req.body;
   const { shortUrl, originalUrl } = await addUrl(url);
@@ -62,8 +62,16 @@ app.post('/api/shorturl', async (req, res) => {
   res.json({ short_url: shortUrl, original_url: originalUrl });
 });
 
-app.get('/api/shorturl/:urlId', (req, res) => {
-  res.json({ redirect: 'redirect' });
+const { findUrl } = require("./db.js");
+app.get('/api/shorturl/:urlId', async (req, res) => {
+  const { urlId } = req.params;
+  const result = await findUrl(parseInt(urlId));
+
+  if (result) {
+    return res.redirect(result.originalUrl);
+  }
+  
+  res.status(404).type("txt").send("Not Found");
 });
 
 
