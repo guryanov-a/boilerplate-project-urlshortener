@@ -1,6 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-sequence')(mongoose);
+const { URL } = require('url');
 
 mongoose.connect(process.env['MONGO_URI'], { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -12,9 +13,8 @@ shortUrlSchema.plugin(autoIncrement, { inc_field: 'shortUrl' });
 const ShortUrl = mongoose.model('ShortUrl', shortUrlSchema);
 
 const addUrl = async (address) => {
-  const result = await ShortUrl.findOne({ originalUrl: address });
-
-  console.log('result', result);
+  const formattedAddress = new URL(address);
+  const result = await ShortUrl.findOne({ originalUrl: formattedAddress.toString() });
 
   if (result) {
     return result;
