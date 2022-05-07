@@ -12,16 +12,15 @@ shortUrlSchema.plugin(autoIncrement, { inc_field: 'shortUrl' });
 
 const ShortUrl = mongoose.model('ShortUrl', shortUrlSchema);
 
-const addUrl = async (address) => {
-  const formattedAddress = new URL(address);
-  const result = await ShortUrl.findOne({ originalUrl: formattedAddress.toString() });
+const addUrl = async (urlObj) => {
+  const result = await ShortUrl.findOne({ originalUrl: urlObj.toString() });
 
   if (result) {
     return result;
   }
 
   const shortUrl = new ShortUrl({ 
-    originalUrl: formattedAddress,
+    originalUrl: urlObj.toString(),
   });
 
   return shortUrl.save();

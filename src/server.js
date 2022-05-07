@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require("body-parser");
+const urlModule = require('url'); 
+const validUrl = require('valid-url');
 
 const app = express();
 
@@ -56,9 +58,19 @@ app.use("/_api", router);
 
 const { addUrl } = require("./db.js");
 app.post('/api/shorturl', async (req, res) => {
-  const { url } = req.body;
-  const { shortUrl, originalUrl } = await addUrl(url);
+  const { url: urlString } = req.body;
+  let url;
   
+  try {
+    if(!validUrl.isWebUri(urlString)) throw new Error();
+    
+    url = new URL(urlString);
+  } catch(e) {
+    res.json({ error: 'invalid url' });
+    return;
+  }
+  
+  const { shortUrl, originalUrl } = await addUrl(url);
   res.json({ short_url: shortUrl, original_url: originalUrl });
 });
 
@@ -73,8 +85,6 @@ app.get('/api/shorturl/:urlId', async (req, res) => {
   
   res.status(404).type("txt").send("Not Found");
 });
-
-
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
